@@ -1,0 +1,97 @@
+{
+    "catalog_size": 3,
+
+    "books": [
+        {
+            "book_id": 0,
+            "book_title": "The Witcher: The Last Wish",
+            "book_author": "Andrzej Sapkowski",
+            "book_year": 1993,
+            "book_price_uan": 465.90,
+            "is_available": true,
+            "book_copies": 6,
+            "issue_history": [
+                {
+                    "issue_date": "2023-01-15",
+                    "return_date": "2023-02-15",
+                    "issued_to": "Dmitry Ivanov"
+                },
+                {
+                    "issue_date": "2023-03-01",
+                    "return_date": "2023-03-15",
+                    "issued_to": "Olga Petrova"
+                },
+                {
+                    "issue_date": "2023-04-10",
+                    "return_date": "2023-04-25",
+                    "issued_to": "Sergey Kozachenko"
+                },
+                {
+                    "issue_date": "2023-05-05",
+                    "return_date": "2023-05-20",
+                    "issued_to": "Vasily Sokolov"
+                }
+            ]
+
+        },
+        {
+            "book_id": 1,
+            "book_title": "1984",
+            "book_author": "George Orwell",
+            "book_year": 1949,
+            "book_price_uan": 299.99,
+            "is_available": false,
+            "book_copies": 1,
+            "issue_history": [
+                {
+                    "issue_date": "2023-02-10",
+                    "return_date": "2023-02-25",
+                    "issued_to": "Anna Smirnova"
+                },
+                {
+                    "issue_date": "2023-03-15",
+                    "return_date": null,
+                    "issued_to": "Alexey Morozov"
+                }
+               
+            ]
+        },
+        {
+            "book_id": 2,
+            "book_title": "To Kill a Mockingbird",
+            "book_author": "Harper Lee",
+            "book_year": 1960,
+            "book_price_uan": 399.50,
+            "is_available": true,
+            "book_copies": 3,
+            "issue_history": [
+                {
+                    "issue_date": "2023-01-20",
+                    "return_date": "2023-02-05",
+                    "issued_to": "Elena Kuznetsova"
+                },
+                {
+                    "issue_date": "2023-03-05",
+                    "return_date": "2023-03-20",
+                    "issued_to": "Maxim Volkov"
+                },
+                {
+                    "issue_date": "2023-04-15",
+                    "return_date": "2023-05-01",
+                    "issued_to": "Yulia Fedorova"
+                },
+                {
+                    "issue_date": "2023-05-10",
+                    "return_date": null,
+                    "issued_to": "Kirill Pavlov"
+                },
+                {
+                    "issue_date": "2023-06-01",
+                    "return_date": null,
+                    "issued_to": "Olga Ivanova"
+                }
+               
+            ]
+        }
+    ]
+}

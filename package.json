@@ -1,0 +1,25 @@
+{
+  "name": "web-server-proj_library-catalog",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MyRuiCHtwo/WEB-server-proj_Library-catalog.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "bugs": {
+    "url": "https://github.com/MyRuiCHtwo/WEB-server-proj_Library-catalog/issues"
+  },
+  "homepage": "https://github.com/MyRuiCHtwo/WEB-server-proj_Library-catalog#readme",
+  "dependencies": {
+    "commander": "^15.0.0"
+  }
+}
