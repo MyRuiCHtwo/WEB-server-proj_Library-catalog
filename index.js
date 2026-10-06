@@ -1,6 +1,6 @@
 import { program } from "commander";
-import { read_file} from "fs/promises";
-import {existsSync} from "fs";
+import { readFile} from "fs/promises";
+import { existsSync } from "fs";
 
 
 async function read_json(filePath) {
@@ -9,7 +9,7 @@ async function read_json(filePath) {
         process.exit(1);
     }
     try {
-        const data = await read_file(filePath, 'utf-8');
+        const data = await readFile(filePath, 'utf-8');
         return JSON.parse(data);
     } catch (error) {
         console.error(`Помилка під час читання або парсингу JSON: ${error.message}`);
@@ -30,7 +30,7 @@ program
     .description("Показує стислий список основних елементів даних з можливістю обмежити кількість показаних.")
     .option("-f, --file <path>", "Шлях до JSON файлу з каталогом бібліотеки", "data.json")
     .option("-l, --limit <number>", "Обмеження кількості показаних елементів", parseInt)
-    .option(async (options) => {
+    .action(async (options) => {
         const catalog = await read_json(options.file);
         let items = catalog.items || [];
         if (options.limit) {
@@ -48,10 +48,11 @@ program
     .command("read-one-item")
     .description("Показує один елемент даних цілком.")
     .option("-f, --file <path>", "Шлях до JSON файлу з каталогом бібліотеки", "data.json")
-    .option("-i, --id <string>", "ID книги для виведення")
+    .requiredOption("-i, --id <string>", "ID книги для виведення")
     .action(async (options) => {
         const catalog = await read_json(options.file);
-        const item = catalog.items.find(i => i.id === options.id);
+        const items = catalog.items || [];
+        const item = items.find(i => String(i.id) === String(options.id));
         if (!item) {
             console.error(`Елемент з ID "${options.id}" не знайдено.`);
             process.exit(1);
@@ -65,11 +66,12 @@ program
     .command("read-one-field")
     .description("Показує одне поле одного елемента даних. Якщо поле порожнє, виводиться повідомлення про це. Якщо значення поле null, виводиться повідомлення про це.")
     .option("-f, --file <path>", "Шлях до JSON файлу з каталогом бібліотеки", "data.json")
-    .option("-n, --name <string>", "Назва елемента для виведення")
-    .option("-k, --key <string>", "Назва поля для виведення")
+    .requiredOption("-n, --name <string>", "Назва елемента для виведення")
+    .requiredOption("-k, --key <string>", "Назва поля для виведення")
     .action(async (options) => { 
         const catalog = await read_json(options.file);
-        const item = catalog.items.find(i => i.title === options.name);
+        const items = catalog.items || [];
+        const item = items.find(i => (i.title || i.book_title) === options.name);
         if (!item) {
             console.error(`Елемент з назвою "${options.name}" не знайдено.`);
             process.exit(1);
@@ -94,10 +96,13 @@ program
     .command("search-book-by-author")
     .description("Пошук книги за частиною імені автора. Виводить список книг, які відповідають критерію пошуку.")
     .option("-f, --file <path>", "Шлях до JSON файлу з каталогом бібліотеки", "data.json")
-    .option("-a, --author <string>", "Частина імені автора для пошуку")
+    .requiredOption("-a, --author <string>", "Частина імені автора для пошуку")
     .action(async (options) => {
         const catalog = await read_json(options.file);
-        const matchingBooks = catalog.items.filter(item => item.book_author.toLowerCase().includes(options.author.toLowerCase()));
+        const items = catalog.items || [];
+        const matchingBooks = items.filter(item => 
+            item.book_author && item.book_author.toLowerCase().includes(options.author.toLowerCase())
+        );
         if (matchingBooks.length === 0) {
             console.log(`Книги за автором, що містить "${options.author}", не знайдено.`);
         } else {
@@ -113,10 +118,13 @@ program
     .command("available-book-examples")
     .description("Показує кількість наявних та незайнятих примірників книги за її назвою.")
     .option("-f, --file <path>", "Шлях до JSON файлу з каталогом бібліотеки", "data.json")
-    .option("-t, --title <string>", "Назва книги для перевірки наявності примірників")
+    .requiredOption("-t, --title <string>", "Назва книги для перевірки наявності примірників")
     .action(async (options) => {
         const catalog = await read_json(options.file);
-        const book = catalog.items.find(item => item.book_title.toLowerCase() === options.title.toLowerCase());
+        const items = catalog.items || [];
+        const book = items.find(item => 
+            item.book_title && item.book_title.toLowerCase() === options.title.toLowerCase()
+        );
         if (!book) {
             console.error(`Книга з назвою "${options.title}" не знайдено.`);
             process.exit(1);
@@ -130,10 +138,13 @@ program
     .command("book-issue-history")
     .description("Показує історію видачі книги за її назвою.")
     .option("-f, --file <path>", "Шлях до JSON файлу з каталогом бібліотеки", "data.json")
-    .option("-t, --title <string>", "Назва книги для перегляду історії видачі")
+    .requiredOption("-t, --title <string>", "Назва книги для перегляду історії видачі")
     .action(async (options) => {
         const catalog = await read_json(options.file);
-        const book = catalog.items.find(item => item.book_title.toLowerCase() === options.title.toLowerCase());
+        const items = catalog.items || [];
+        const book = items.find(item => 
+            item.book_title && item.book_title.toLowerCase() === options.title.toLowerCase()
+        );
 
         if (!book) {
             console.error(`Книга з назвою "${options.title}" не знайдено.`);
@@ -152,5 +163,6 @@ program
     });
         
 
+program.parse(process.argv);
 
 
