@@ -18,6 +18,23 @@ async function read_json(filePath) {
 }
 
 
+function getNestedValue(obj, path) {
+    if (!obj || !path) return undefined;
+    
+    const normalizedPath = path.replace(/\[(\d+)\]/g, '.$1');
+    const keys = normalizedPath.split('.');
+    
+    let current = obj;
+    for (const key of keys) {
+        if (current === null || current === undefined) {
+            return undefined;
+        }
+        current = current[key];
+    }
+    return current;
+}
+
+
 program
     .name("library-catalog-reader")
     .description("Програма для читання та виведення каталогу бібліотеки та окремих його елементів з JSON файлу.")
@@ -37,7 +54,7 @@ program
             books = books.slice(0, options.limit);
         }
         console.log("Стислий список елементів каталогу:");
-        books.forEach((item, index) => {
+        books.forEach((book, index) => {
             console.log(`${index + 1}. [ID: ${book.book_id}] "${book.book_title}" — ${book.book_author} (${book.book_year})`);
         });
                
@@ -66,27 +83,28 @@ program
     .command("read-one-field")
     .description("Показує одне поле одного елемента даних. Якщо поле порожнє, виводиться повідомлення про це. Якщо значення поле null, виводиться повідомлення про це.")
     .option("-f, --file <path>", "Шлях до JSON файлу з каталогом бібліотеки", "data.json")
-    .requiredOption("-n, --name <string>", "Назва елемента для виведення")
+    .requiredOption("-i, --id <number>", "ID книги для виведення", parseInt)
     .requiredOption("-k, --key <string>", "Назва поля для виведення")
     .action(async (options) => { 
         const catalog = await read_json(options.file);
         const books = catalog.books || [];
-        const item = books.find(b => b.book_title.toLowerCase() === options.name.toLowerCase());
+        const item = books.find(b => b.book_id === options.id);
         if (!item) {
-            console.error(`Елемент з назвою "${options.name}" не знайдено.`);
+            console.error(`Елемент з ID "${options.id}" не знайдено.`);
             process.exit(1);
         }
-        const fieldValue = item[options.key];
+        const fieldValue = getNestedValue(item, options.key);
+
         if (fieldValue === undefined) {
-            console.error(`Поле "${options.key}" не знайдено у елемента "${options.name}".`);
+            console.error(`Поле "${options.key}" не знайдено у елемента "${options.id}".`);
             process.exit(1);
         }
         if (fieldValue === null) {
-            console.log(`Поле "${options.key}" у елемента "${options.name}" має значення null.`);
+            console.log(`Поле "${options.key}" у елемента "${options.id}" має значення null.`);
         } else if (fieldValue === "") {
-            console.log(`Поле "${options.key}" у елемента "${options.name}" порожнє.`);
+            console.log(`Поле "${options.key}" у елемента "${options.id}" порожнє.`);
         }
-        console.log(`Значення поля "${options.key}" у елемента "${options.name}": ${fieldValue}`);
+        console.log(`Значення поля "${options.key}" у елемента "${options.id}": ${fieldValue}`);
 
     });
 
