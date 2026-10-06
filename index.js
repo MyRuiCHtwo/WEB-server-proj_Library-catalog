@@ -32,13 +32,13 @@ program
     .option("-l, --limit <number>", "Обмеження кількості показаних елементів", parseInt)
     .action(async (options) => {
         const catalog = await read_json(options.file);
-        let items = catalog.items || [];
+        let books = catalog.books || [];
         if (options.limit) {
-            items = items.slice(0, options.limit);
+            books = books.slice(0, options.limit);
         }
         console.log("Стислий список елементів каталогу:");
-        items.forEach((item, index) => {
-            console.log(`${index + 1}. ${item.title} (${item.type})`);
+        books.forEach((item, index) => {
+            console.log(`${index + 1}. [ID: ${book.book_id}] "${book.book_title}" — ${book.book_author} (${book.book_year})`);
         });
                
     });
@@ -48,11 +48,11 @@ program
     .command("read-one-item")
     .description("Показує один елемент даних цілком.")
     .option("-f, --file <path>", "Шлях до JSON файлу з каталогом бібліотеки", "data.json")
-    .requiredOption("-i, --id <string>", "ID книги для виведення")
+    .requiredOption("-i, --id <number>", "ID книги для виведення", parseInt)
     .action(async (options) => {
         const catalog = await read_json(options.file);
-        const items = catalog.items || [];
-        const item = items.find(i => String(i.id) === String(options.id));
+        const books = catalog.books || [];
+        const item = books.find(b => b.book_id === options.id);
         if (!item) {
             console.error(`Елемент з ID "${options.id}" не знайдено.`);
             process.exit(1);
@@ -70,8 +70,8 @@ program
     .requiredOption("-k, --key <string>", "Назва поля для виведення")
     .action(async (options) => { 
         const catalog = await read_json(options.file);
-        const items = catalog.items || [];
-        const item = items.find(i => (i.title || i.book_title) === options.name);
+        const books = catalog.books || [];
+        const item = books.find(b => b.book_title.toLowerCase() === options.name.toLowerCase());
         if (!item) {
             console.error(`Елемент з назвою "${options.name}" не знайдено.`);
             process.exit(1);
@@ -99,8 +99,8 @@ program
     .requiredOption("-a, --author <string>", "Частина імені автора для пошуку")
     .action(async (options) => {
         const catalog = await read_json(options.file);
-        const items = catalog.items || [];
-        const matchingBooks = items.filter(item => 
+        const books = catalog.books || [];
+        const matchingBooks = books.filter(item => 
             item.book_author && item.book_author.toLowerCase().includes(options.author.toLowerCase())
         );
         if (matchingBooks.length === 0) {
@@ -121,16 +121,18 @@ program
     .requiredOption("-t, --title <string>", "Назва книги для перевірки наявності примірників")
     .action(async (options) => {
         const catalog = await read_json(options.file);
-        const items = catalog.items || [];
-        const book = items.find(item => 
+        const books = catalog.books || [];
+        const book = books.find(item => 
             item.book_title && item.book_title.toLowerCase() === options.title.toLowerCase()
         );
         if (!book) {
             console.error(`Книга з назвою "${options.title}" не знайдено.`);
             process.exit(1);
         }
-        const availableCopies = book.book_copies - book.issue_history.length;
-        console.log(`Книга "${book.book_title}" має ${availableCopies} наявних та незайнятих примірників.`);
+        const currentlyIssued = (book.issue_history || []).filter(i => i.return_date === null).length;
+        const availableCopies = book.book_copies - currentlyIssued;
+        
+        console.log(`Книга "${book.book_title}" має ${availableCopies} вільних примірників (всього: ${book.book_copies}, зараз на руках: ${currentlyIssued}).`);
     });
     
     
@@ -141,8 +143,8 @@ program
     .requiredOption("-t, --title <string>", "Назва книги для перегляду історії видачі")
     .action(async (options) => {
         const catalog = await read_json(options.file);
-        const items = catalog.items || [];
-        const book = items.find(item => 
+        const books = catalog.books || [];
+        const book = books.find(item => 
             item.book_title && item.book_title.toLowerCase() === options.title.toLowerCase()
         );
 
