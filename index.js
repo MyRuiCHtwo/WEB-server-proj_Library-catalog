@@ -103,9 +103,14 @@ program
             console.log(`Поле "${options.key}" у елемента "${options.id}" має значення null.`);
         } else if (fieldValue === "") {
             console.log(`Поле "${options.key}" у елемента "${options.id}" порожнє.`);
-        }
-        console.log(`Значення поля "${options.key}" у елемента "${options.id}": ${fieldValue}`);
 
+        } else if (typeof fieldValue === 'object') {
+            console.log(`Значення вкладеного об'єкта "${options.key}":`);
+            console.log(JSON.stringify(fieldValue, null, 2));
+        } else {
+            console.log(`Значення поля "${options.key}" у книги "${options.name}": ${fieldValue}`);
+        }
+        
     });
 
 
